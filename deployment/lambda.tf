@@ -3,7 +3,7 @@ data "aws_caller_identity" "current" {}
 locals {
   root_dir   = "${path.module}/.."
   account_id = data.aws_caller_identity.current.account_id
-  build_args = "--build-arg binary=checkerboard --build-arg log_level=${var.log_level}"
+  build_args = "--build-arg binary=kaarten --build-arg log_level=${var.log_level}"
 }
 
 resource "aws_ecr_repository" "kaarten_lambda" {
