@@ -1,4 +1,4 @@
-FROM rust:1.55 as build
+FROM rust:1.63 as build
 ARG binary
 WORKDIR /usr/src/api-service
 COPY . .
