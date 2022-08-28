@@ -5,6 +5,9 @@ use lambda_runtime::{handler_fn, Context, Error};
 use simple_logger::SimpleLogger;
 use log::LevelFilter;
 
+pub mod handlers;
+pub mod clients;
+
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     SimpleLogger::new().with_level(LevelFilter::Debug).with_utc_timestamps().init().unwrap();
