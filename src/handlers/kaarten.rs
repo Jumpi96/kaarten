@@ -3,10 +3,11 @@ use aws_lambda_events::event::apigw::{ApiGatewayProxyRequest, ApiGatewayProxyRes
 use http::header::HeaderMap;
 use lambda_runtime::{handler_fn, Context, Error};
 use simple_logger::SimpleLogger;
+use log::LevelFilter;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    SimpleLogger::new().with_utc_timestamps().init().unwrap();
+    SimpleLogger::new().with_level(LevelFilter::Debug).with_utc_timestamps().init().unwrap();
 
     let func = handler_fn(func);
     lambda_runtime::run(func).await?;
