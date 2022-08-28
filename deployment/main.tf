@@ -2,11 +2,9 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~>3.27"
+      version = "3.62.0"
     }
   }
-
-  required_version = ">=0.14.9"
 
   backend "s3" {
     bucket = "kaarten-terraform-state-bucket"
@@ -16,6 +14,5 @@ terraform {
 }
 
 provider "aws" {
-  version = "~>3.0"
   region = "us-west-2"
 }
