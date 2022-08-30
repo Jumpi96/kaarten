@@ -7,6 +7,7 @@ use log::LevelFilter;
 
 pub mod handlers;
 pub mod clients;
+pub mod entities;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -18,19 +19,28 @@ async fn main() -> Result<(), Error> {
 }
 
 async fn func(event: ApiGatewayProxyRequest, _: Context) -> Result<ApiGatewayProxyResponse, Error> {
-    let method = event.http_method.as_str();
-    let path = event.path.unwrap();
+    let body = &event.body;
 
-    log::debug!("Running in debug mode");
-    log::info!("Received {} request on {}", method, path);
-
-    let resp = ApiGatewayProxyResponse {
-        status_code: 200,
+    let empty_res = ApiGatewayProxyResponse {
+        status_code: 201,
         headers: HeaderMap::new(),
         multi_value_headers: HeaderMap::new(),
-        body: Some(Body::Text(format!("Hello from '{}'", path))),
+        body: Some(Body::Text(String::from(""))),
         is_base64_encoded: Some(false),
     };
 
-    Ok(resp)
+    let body: serde_json::Value =
+        serde_json::from_str(body.as_ref().unwrap_or(&String::from("{}"))).unwrap();
+
+    match body.get("message") {
+        None => log::error!("Message doesn't exist!"),
+        msg => {
+            let command = msg.unwrap().as_str().unwrap();
+            match command {
+                command if command.starts_with("/add") => handlers::add_handler(&body).await,
+                _ => log::info!("Discarding unknown input...")
+            }
+        }
+    }
+    Ok(empty_res)
 }
