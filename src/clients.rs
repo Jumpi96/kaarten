@@ -65,7 +65,7 @@ pub async fn send_message(chat_id: i64, msg: &str) -> Result<(), SimpleError> {
     let client = reqwest::Client::new();
     let token = env::var("TELEGRAM_TOKEN").unwrap_or(String::from(""));
     match client.post(format!("{}/bot{}/sendMessage", TELEGRAM_URL, token))
-        .body(format!("{{\"chat_id\": \"{}\", \"text\": {}}}", chat_id, msg))
+        .json(format!("{{\"chat_id\": \"{}\", \"text\": \"{}\"}}", chat_id, msg))
         .send()
         .await {
             Ok(resp) => {log::debug!("{:#?}", resp); Ok(())}
