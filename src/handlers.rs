@@ -108,14 +108,14 @@ pub async fn report_handler(message: &serde_json::Value) {
         Some(collector) => {
             let mut message = String::from("⚽🏆 Your WK 2022 report 📒⚽\n");
             let groups = collector.stickers_as_groups();
-            let mut total = 0;
-            let mut have = 0;
-            let mut repeated = 0;
+            let mut total: u16 = 0;
+            let mut have: u16= 0;
+            let mut repeated: u16 = 0;
 
             for group in entities::SPECIAL_STICKERS {
-                let group_total = entities::NON_TEAM_CARDS.1 - entities::NON_TEAM_CARDS.0 + 1;
-                let mut group_have = 0;
-                let mut group_repeated = 0;
+                let group_total = u16::from(entities::NON_TEAM_CARDS.1 - entities::NON_TEAM_CARDS.0 + 1);
+                let mut group_have: u16 = 0;
+                let mut group_repeated: u16 = 0;
 
                 match groups.get(group) {
                     Some(v) => {
@@ -123,7 +123,7 @@ pub async fn report_handler(message: &serde_json::Value) {
                             match v.get(&i.to_string()) {
                                 Some(n) => match n {
                                     1 => {group_have += 1},
-                                    r => {group_have += 1; group_repeated += r-1}
+                                    r => {group_have += 1; group_repeated += u16::from(*r) - 1}
                                 },
                                 None => ()
                             }
@@ -136,14 +136,14 @@ pub async fn report_handler(message: &serde_json::Value) {
                 have += group_have;
                 repeated += group_repeated;
 
-                let percentage = format!("{:.2}", group_have as f32 / group_total as f32); 
+                let percentage = format!("{:.2}", (group_have as f32 / group_total as f32) * 100.0); 
                 message.push_str(&format!("{}: {}% ({}/{}/{})\n", group, percentage, group_have, group_repeated, group_total));
             }
 
             for group in entities::TEAMS {
-                let group_total = entities::CARDS_PER_TEAM.1 - entities::CARDS_PER_TEAM.0 + 1;
-                let mut group_have = 0;
-                let mut group_repeated = 0;
+                let group_total = u16::from(entities::CARDS_PER_TEAM.1 - entities::CARDS_PER_TEAM.0 + 1);
+                let mut group_have: u16 = 0;
+                let mut group_repeated: u16 = 0;
 
                 match groups.get(group) {
                     Some(v) => {
@@ -151,7 +151,7 @@ pub async fn report_handler(message: &serde_json::Value) {
                             match v.get(&i.to_string()) {
                                 Some(n) => match n {
                                     1 => {group_have += 1},
-                                    r => {group_have += 1; group_repeated += r-1}
+                                    r => {group_have += 1; group_repeated += u16::from(*r) - 1}
                                 },
                                 None => ()
                             }
@@ -164,11 +164,11 @@ pub async fn report_handler(message: &serde_json::Value) {
                 have += group_have;
                 repeated += group_repeated;
 
-                let percentage = format!("{:.2}", group_have as f32 / group_total as f32); 
+                let percentage = format!("{:.2}", (group_have as f32 / group_total as f32) * 100.0); 
                 message.push_str(&format!("{}: {}% ({}/{}/{})\n", group, percentage, group_have, group_repeated, group_total));
             }
             
-            let percentage = format!("{:.2}", have as f32 / total as f32); 
+            let percentage = format!("{:.2}", (have as f32 / total as f32) * 100.0); 
             message.push_str(&format!("\n🏆{}% ({}/{}/{})🏆", percentage, have, repeated, total));
             match send_message(collector.chat_id, &message).await {
                 Ok(_) => (),
