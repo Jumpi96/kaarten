@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
 use crate::clients::{get_collector, save_collector};
-use crate::entities::Collector;
+use crate::entities::{Collector, validate_sticker};
 
 pub async fn add_handler(message: &serde_json::Value) {
     let user_id = match get_id_from_message(message, "from") {
@@ -25,14 +25,18 @@ pub async fn add_handler(message: &serde_json::Value) {
     };
     let stickers: Vec<&str> = message.get("text").unwrap().as_str().unwrap().split(' ').collect();
     for s in stickers {
-        if s != "/add" { // TODO: filter this and not-messages
-            let time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
-            let time_vec: Vec<u64> = vec![time.as_secs()];
-            let s_vec = match collector.stickers.get(s) {
-                Some(v) => [v.as_slice(), time_vec.as_slice()].concat(),
-                None => time_vec
-            };
-            collector.stickers.insert(String::from(s), s_vec);
+        match validate_sticker(s) {
+            Some(sticker) => {
+                let time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+                let time_vec: Vec<u64> = vec![time.as_secs()];
+                let s_vec = match collector.stickers.get(sticker) {
+                    Some(v) => [v.as_slice(), time_vec.as_slice()].concat(),
+                    None => time_vec
+                };
+                collector.stickers.insert(String::from(sticker), s_vec);
+            },
+            None if s != "/add" => log::warn!("Not a valid sticker: {}", s),
+            None => ()
         }
     }
     match save_collector(collector).await {
