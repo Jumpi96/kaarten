@@ -51,6 +51,35 @@ pub fn validate_sticker(s: &str) -> Option<&str> {
     None
 }
 
+impl Collector {
+    pub fn stickers_as_groups(&self) -> HashMap<String, HashMap<String, u8>> {
+        let mut groups: HashMap<String, HashMap<String, u8>> = HashMap::new();
+        for sticker in self.stickers.keys() {
+            let mut sticker_chars = sticker.chars();
+            let mut prefix = String::from("");
+            let mut number = String::from("");
+            for _ in 0..3 {
+                prefix.push(sticker_chars.next().unwrap());
+            }
+            loop {
+                match sticker_chars.next() {
+                    Some(c) => number.push(c),
+                    None => {break;}
+                }
+            }
+            match groups.get_mut(&prefix) {
+                Some(g) => {g.insert(number, self.stickers.get(sticker).unwrap().len() as u8);},
+                None => {
+                    let mut group_map = HashMap::new();
+                    group_map.insert(number, self.stickers.get(sticker).unwrap().len() as u8);
+                    groups.insert(prefix, group_map);
+                }
+            }
+        }
+        groups
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -66,5 +95,24 @@ mod tests {
         let good_special_sticker = validate_sticker("FWC0");
         assert!(good_special_sticker.is_some());
         assert!(good_special_sticker.unwrap() == "FWC0");        
+    }
+    
+    #[test]
+    fn test_collector_as_groups() {
+        let mut stickers: HashMap<String, Vec<u64>> = HashMap::new();
+        stickers.insert(String::from("ARG1"), vec![1661975120, 1661975130]);
+        stickers.insert(String::from("ARG2"), vec![1661975120]);
+        stickers.insert(String::from("NED10"), vec![1661975120]);
+        let c = Collector{
+            user_id: 1,
+            chat_id: 1,
+            stickers
+        };
+        let groups = c.stickers_as_groups();
+        assert_eq!(groups.get("ARG").unwrap().get("1").unwrap(), &2);
+        assert_eq!(groups.get("ARG").unwrap().get("2").unwrap(), &1);
+        assert_eq!(groups.get("NED").unwrap().get("10").unwrap(), &1);
+        assert_eq!(groups.get("NED").unwrap().get("0").is_none(), true);
+        assert_eq!(groups.get("KSA").is_none(), true);
     }
 }
