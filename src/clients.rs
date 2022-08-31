@@ -4,6 +4,7 @@ use std::env;
 use std::collections::HashMap;
 use aws_sdk_dynamodb::{Client, Error, model::AttributeValue};
 use simple_error::SimpleError;
+use reqwest::header::CONTENT_TYPE;
 
 use aws_config;
 use reqwest;
@@ -65,7 +66,8 @@ pub async fn send_message(chat_id: i64, msg: &str) -> Result<(), SimpleError> {
     let client = reqwest::Client::new();
     let token = env::var("TELEGRAM_TOKEN").unwrap_or(String::from(""));
     match client.post(format!("{}/bot{}/sendMessage", TELEGRAM_URL, token))
-        .json(format!("{{\"chat_id\": \"{}\", \"text\": \"{}\"}}", chat_id, msg))
+        .body(format!("{{\"chat_id\": {}, \"text\": \"{}\"}}", chat_id, msg))
+        .header(CONTENT_TYPE, "application/json")
         .send()
         .await {
             Ok(resp) => {log::debug!("{:#?}", resp); Ok(())}
