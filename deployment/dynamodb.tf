@@ -14,7 +14,10 @@ resource "aws_dynamodb_table" "collectors-dynamodb-table" {
     type = "N"
   }
 
-
+  point_in_time_recovery {
+    enabled = true
+  }
+  
   tags = {
     Name        = "kaarten-collectors-table"
   }
