@@ -61,7 +61,7 @@ pub async fn remove_handler(message: &serde_json::Value) {
             match save_collector(collector).await {
                 Ok(()) => (),
                 Err(e) => log::error!("Error saving Collector while removing: {}", e)
-            },
+            }
         },
         None => ()
     }
