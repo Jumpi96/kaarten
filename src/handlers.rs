@@ -27,7 +27,7 @@ pub async fn add_handler(message: &serde_json::Value) {
     for s in stickers {
         if s != "/add" { // TODO: filter this and not-messages
             let time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
-            let time_vec: Vec<u16> = vec![time.as_secs() as u16];
+            let time_vec: Vec<u64> = vec![time.as_secs()];
             let s_vec = match collector.stickers.get(s) {
                 Some(v) => [v.as_slice(), time_vec.as_slice()].concat(),
                 None => time_vec

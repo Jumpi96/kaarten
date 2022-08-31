@@ -56,20 +56,20 @@ pub async fn save_collector(collector: entities::Collector) -> Result<(), Simple
     }
 }
 
-fn deserialize_stickers(value: &AttributeValue) -> HashMap<String, Vec<u16>> {
-    let mut stickers: HashMap<String, Vec<u16>> = HashMap::new();
+fn deserialize_stickers(value: &AttributeValue) -> HashMap<String, Vec<u64>> {
+    let mut stickers: HashMap<String, Vec<u64>> = HashMap::new();
     for sticker in value.as_m().unwrap() {
-        let mut s_dates: Vec<u16> = vec![];
+        let mut s_dates: Vec<u64> = vec![];
         let list = sticker.1.as_l().unwrap();
         for v in list {
-            s_dates.push(v.as_n().unwrap().parse::<u16>().unwrap());
+            s_dates.push(v.as_n().unwrap().parse::<u64>().unwrap());
         }
         stickers.insert(sticker.0.to_string(), s_dates);
     }
     stickers
 }
 
-fn serialize_stickers(stickers: HashMap<String, Vec<u16>>) -> AttributeValue {
+fn serialize_stickers(stickers: HashMap<String, Vec<u64>>) -> AttributeValue {
     let mut s_stickers: HashMap<String, AttributeValue> = HashMap::new();
     for sticker in stickers {
         let mut time_list: Vec<AttributeValue> = vec![];
