@@ -7,14 +7,16 @@ pub async fn add_handler(message: &serde_json::Value) {
     match get_collector_from_message(message).await {
         Some(mut collector) => {
             let stickers: Vec<&str> = message.get("text").unwrap().as_str().unwrap().split(' ').collect();
+            let mut count_new = 0;
+            let mut count_dup = 0;
             for s in stickers {
                 match validate_sticker(s) {
                     Some(sticker) => {
                         let time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
                         let time_vec: Vec<u64> = vec![time.as_secs()];
                         let s_vec = match collector.stickers.get(sticker) {
-                            Some(v) => [v.as_slice(), time_vec.as_slice()].concat(),
-                            None => time_vec
+                            Some(v) => {count_dup += 1; [v.as_slice(), time_vec.as_slice()].concat()},
+                            None => {count_new += 1; time_vec}
                         };
                         collector.stickers.insert(String::from(sticker), s_vec);
                     },
@@ -22,8 +24,13 @@ pub async fn add_handler(message: &serde_json::Value) {
                     None => ()
                 }
             }
+            let chat_id = collector.chat_id;
+            let message = &format!("🏆✍️ Great! {} new stickers and {} duplicated ones.", count_dup, count_new);
             match save_collector(collector).await {
-                Ok(()) => (),
+                Ok(()) => match send_message(chat_id, message).await {
+                    Ok(_) => (),
+                    Err(e) => {log::error!("Error sending message: {}", e); return}
+                },
                 Err(e) => log::error!("Error saving Collector: {}", e)
             }
         },
@@ -36,11 +43,13 @@ pub async fn remove_handler(message: &serde_json::Value) {
     match get_collector_from_message(message).await {
         Some(mut collector) => {
             let stickers: Vec<&str> = message.get("text").unwrap().as_str().unwrap().split(' ').collect();
+            let mut count = 0;
             for s in stickers {
                 match validate_sticker(s) {
                     Some(sticker) => {
                         match collector.stickers.get(sticker) {
                             Some(v) => {
+                                count += 1;
                                 let mut new_v: Vec<u64> = vec![];
                                 for i in 0..v.len()-1 {
                                     new_v.push(*v.get(i).unwrap());
@@ -58,10 +67,15 @@ pub async fn remove_handler(message: &serde_json::Value) {
                     None => ()
                 }
             }
+            let chat_id = collector.chat_id;
             match save_collector(collector).await {
-                Ok(()) => (),
+                Ok(()) => match send_message(chat_id, &format!("🏆❌ Done! {} stickers removed.", count)).await {
+                    Ok(_) => (),
+                    Err(e) => {log::error!("Error sending message: {}", e); return}
+                },
                 Err(e) => log::error!("Error saving Collector while removing: {}", e)
             }
+            
         },
         None => ()
     }
