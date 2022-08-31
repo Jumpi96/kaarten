@@ -17,10 +17,10 @@ const TEAMS: [&str; 32] = [
     "BRA", "SRB", "SUI", "CAM",
     "POR", "GHA", "URU", "KOR"
 ];
-const CARDS_PER_TEAM: Vec<u8> = vec![1, 20];
+const CARDS_PER_TEAM: (u8, u8) = (1, 20);
 
 const SPECIAL_STICKERS: [&str; 1] = ["FWC"];
-const NON_TEAM_CARDS: Vec<u8> = vec![0, 29]; 
+const NON_TEAM_CARDS: (u8, u8) = (0, 29); 
 
 pub fn validate_sticker(s: &str) -> Option<&str> {
     if s.len() > 3 {
@@ -38,11 +38,11 @@ pub fn validate_sticker(s: &str) -> Option<&str> {
         }
         return match &prefix.as_str() {
             m if TEAMS.contains(m) => match number.parse::<u8>() {
-                Ok(n) if n >= CARDS_PER_TEAM[0] && n <= CARDS_PER_TEAM[1] => Some(s),
+                Ok(n) if n >= CARDS_PER_TEAM.0 && n <= CARDS_PER_TEAM.1 => Some(s),
                 _ => None
             },
             m if SPECIAL_STICKERS.contains(m) => match number.parse::<u8>() {
-                Ok(n) if n >= NON_TEAM_CARDS[0] && n <= NON_TEAM_CARDS[1] => Some(s),
+                Ok(n) if n >= NON_TEAM_CARDS.0 && n <= NON_TEAM_CARDS.1 => Some(s),
                 _ => None
             },
             _ => None
