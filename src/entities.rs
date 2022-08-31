@@ -7,7 +7,7 @@ pub struct Collector {
     pub stickers: HashMap<String, Vec<u64>>
 }
 
-const TEAMS: [&str; 32] = [
+pub const TEAMS: [&str; 32] = [
     "QAT", "ECU", "SEN", "NED",
     "ENG", "IRN", "USA", "WAL",
     "ARG", "KSA", "MEX", "POL",
@@ -17,10 +17,10 @@ const TEAMS: [&str; 32] = [
     "BRA", "SRB", "SUI", "CAM",
     "POR", "GHA", "URU", "KOR"
 ];
-const CARDS_PER_TEAM: (u8, u8) = (1, 20);
+pub const CARDS_PER_TEAM: (u8, u8) = (1, 20);
 
-const SPECIAL_STICKERS: [&str; 1] = ["FWC"];
-const NON_TEAM_CARDS: (u8, u8) = (0, 29); 
+pub const SPECIAL_STICKERS: [&str; 1] = ["FWC"];
+pub const NON_TEAM_CARDS: (u8, u8) = (0, 29); 
 
 pub fn validate_sticker(s: &str) -> Option<&str> {
     if s.len() > 3 {
