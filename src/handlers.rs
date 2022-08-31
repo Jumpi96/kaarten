@@ -45,6 +45,55 @@ pub async fn add_handler(message: &serde_json::Value) {
     }
 }
 
+pub async fn remove_handler(message: &serde_json::Value) {
+    let user_id = match get_id_from_message(message, "from") {
+        Some(x) => x,
+        _ => {log::error!("User ID doesn't exist!"); return}
+    };
+    let chat_id = match get_id_from_message(message, "chat") {
+        Some(x) => x,
+        _ => {log::error!("Chat ID doesn't exist!"); return}
+    };
+    let mut collector = match get_collector(user_id, chat_id).await {
+        Ok(r) => match r {
+            Some(c) => c,
+            None => (Collector {
+                user_id,
+                chat_id,
+                stickers: HashMap::new(),
+            })
+        },
+        Err(e) => {log::error!("Error getting Collector: {}", e); return}
+    };
+    let stickers: Vec<&str> = message.get("text").unwrap().as_str().unwrap().split(' ').collect();
+    for s in stickers {
+        match validate_sticker(s) {
+            Some(sticker) => {
+                match collector.stickers.get(sticker) {
+                    Some(v) => {
+                        let mut new_v: Vec<u64> = vec![];
+                        for i in 0..v.len()-1 {
+                            new_v.push(*v.get(i).unwrap());
+                        }
+                        match new_v.len() {
+                            0 => collector.stickers.remove(sticker),
+                            _ => collector.stickers.insert(String::from(sticker), new_v)
+                        }
+                    },
+                    None => None
+                };
+                
+            },
+            None if s != "/remove" => log::warn!("Not a valid sticker: {}", s),
+            None => ()
+        }
+    }
+    match save_collector(collector).await {
+        Ok(()) => (),
+        Err(e) => log::error!("Error saving Collector while removing: {}", e)
+    }
+}
+
 fn get_id_from_message(message: &serde_json::Value, first_level: &str) -> Option<i64> {
     let user_id = match message.get(first_level) {
         Some(serde_json::Value::Object(x)) => x.get("id"),

@@ -41,6 +41,7 @@ async fn func(event: ApiGatewayProxyRequest, _: Context) -> Result<ApiGatewayPro
             Some(message_obj) => match message_obj.get("text") {
                 Some(text) => match text.as_str() {
                     Some(text) if text.starts_with("/add") => handlers::add_handler(message).await,
+                    Some(text) if text.starts_with("/remove") => handlers::remove_handler(message).await,
                     Some(_) => log::info!("Discarding unknown input..."),
                     None => log::error!("Discarding invalid input...")
                 },
