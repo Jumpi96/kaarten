@@ -21,5 +21,5 @@ variable "log_level" {
 }
 
 variable "telegram_token" {
-  type = "string"
+  type = string
 }
