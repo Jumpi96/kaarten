@@ -114,9 +114,39 @@ pub async fn list_handler(message: &serde_json::Value) {
         },
         Err(e) => {log::error!("Error getting Collector: {}", e); return}
     };
-    let mut message = String::from("You have: ");
+    let mut message = String::from("🏆 Your WK 2022 stickers ⚽\n");
+    let mut groups: HashMap<String, HashMap<String, u8>> = HashMap::new();
     for sticker in collector.stickers.keys() {
-        message.push_str(&format!("{} ", sticker));
+        let mut sticker_chars = sticker.chars();
+        let mut prefix = String::from("");
+        let mut number = String::from("");
+        for _ in 0..3 {
+            prefix.push(sticker_chars.next().unwrap());
+        }
+        loop {
+            match sticker_chars.next() {
+                Some(c) => number.push(c),
+                None => {break;}
+            }
+        }
+        match groups.get_mut(&prefix) {
+            Some(g) => match g.get_mut(&number) {
+                Some(n) => {let c = *n + 1; g.insert(number, c);},
+                None => {g.insert(number, 1);}
+            },
+            None => {
+                let mut group_map = HashMap::new();
+                group_map.insert(number, 1);
+                groups.insert(prefix, group_map);
+            }
+        }
+    }
+    for group in groups.keys() {
+        message.push_str(&format!("{} ", group));
+        for sticker in groups.get(group).unwrap() {
+            message.push_str(&format!("{}{} ", sticker.0, number_to_emoji(sticker.1)))
+        }
+        message.push_str("\n");
     }
     match send_message(chat_id, &message).await {
         Ok(_) => (),
@@ -133,4 +163,21 @@ fn get_id_from_message(message: &serde_json::Value, first_level: &str) -> Option
         Some(serde_json::Value::Number(x)) => Some(x.as_i64().unwrap()),
         _ => None
     }
+}
+
+fn number_to_emoji(n: &u8) -> String {
+    String::from(
+        match n {
+            1 => "",
+            2 => "x2️⃣",
+            3 => "x3️⃣",
+            4 => "x4️⃣",
+            5 => "x5️⃣",
+            6 => "x6️⃣",
+            7 => "x7️⃣",
+            8 => "x8️⃣",
+            9 => "x9️⃣",
+            _ => "x🔟+"
+        }
+    )
 }
