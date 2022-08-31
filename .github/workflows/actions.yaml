@@ -32,8 +32,9 @@ jobs:
         AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
     - name: Terraform Apply
-      run: terraform apply -auto-approve -var="aws_region=us-west-2" -var="aws_access_key=$AWS_ACCESS_KEY_ID" -var="aws_secret_key=$AWS_SECRET_ACCESS_KEY"
+      run: terraform apply -auto-approve -var="aws_region=us-west-2" -var="aws_access_key=$AWS_ACCESS_KEY_ID" -var="aws_secret_key=$AWS_SECRET_ACCESS_KEY" -var="telegram_token=$TELEGRAM_TOKEN"
       working-directory: "./deployment"
       env:
         AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        TELEGRAM_TOKEN:  ${{ secrets.TELEGRAM_TOKEN }}

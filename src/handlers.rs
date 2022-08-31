@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
-use crate::clients::{get_collector, save_collector};
+use crate::clients::{get_collector, save_collector, send_message};
 use crate::entities::{Collector, validate_sticker};
 
 pub async fn add_handler(message: &serde_json::Value) {
@@ -92,6 +92,14 @@ pub async fn remove_handler(message: &serde_json::Value) {
         Ok(()) => (),
         Err(e) => log::error!("Error saving Collector while removing: {}", e)
     }
+}
+
+pub async fn answer_handler(message: &serde_json::Value) {
+    let chat_id = match get_id_from_message(message, "chat") {
+        Some(x) => x,
+        _ => {log::error!("Chat ID doesn't exist!"); return}
+    };
+    send_message(chat_id, "Hi!").await;
 }
 
 fn get_id_from_message(message: &serde_json::Value, first_level: &str) -> Option<i64> {

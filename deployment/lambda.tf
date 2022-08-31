@@ -19,6 +19,12 @@ resource "aws_lambda_function" "kaarten" {
   timeout     = 10
   memory_size = 128
   role        = aws_iam_role.kaarten.arn
+
+  environment {
+    variables = {
+      TELEGRAM_TOKEN = var.telegram_token
+    }
+  }
 }
 
 resource "null_resource" "lambda_ecr_image_builder" {

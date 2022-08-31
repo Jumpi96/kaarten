@@ -19,3 +19,7 @@ variable "log_level" {
   type    = string
   default = "info"
 }
+
+variable "telegram_token" {
+  type = "string"
+}
