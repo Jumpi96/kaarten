@@ -27,7 +27,7 @@ pub fn validate_sticker(s: &str) -> Option<&str> {
         let mut s_chars = s.chars();
         let mut prefix = String::from("");
         let mut number = String::from("");
-        for _ in 0..2 {
+        for _ in 0..3 {
             prefix.push(s_chars.next().unwrap());
         }
         loop {
@@ -49,4 +49,22 @@ pub fn validate_sticker(s: &str) -> Option<&str> {
         }
     }
     None
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_validate_sticker() {
+        let good_team_sticker = validate_sticker("ARG1");
+        assert!(good_team_sticker.is_some());
+        assert!(good_team_sticker.unwrap() == "ARG1");
+
+        assert!(validate_sticker("sdfsfsd").is_none());
+        assert!(validate_sticker("ARG1231").is_none());
+        
+        let good_special_sticker = validate_sticker("FWC0");
+        assert!(good_special_sticker.is_some());
+        assert!(good_special_sticker.unwrap() == "FWC0");        
+    }
 }
