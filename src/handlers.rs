@@ -94,12 +94,34 @@ pub async fn remove_handler(message: &serde_json::Value) {
     }
 }
 
-pub async fn answer_handler(message: &serde_json::Value) {
+pub async fn list_handler(message: &serde_json::Value) {
+    let user_id = match get_id_from_message(message, "from") {
+        Some(x) => x,
+        _ => {log::error!("User ID doesn't exist!"); return}
+    };
     let chat_id = match get_id_from_message(message, "chat") {
         Some(x) => x,
         _ => {log::error!("Chat ID doesn't exist!"); return}
     };
-    send_message(chat_id, "Hi!").await;
+    let collector = match get_collector(user_id, chat_id).await {
+        Ok(r) => match r {
+            Some(c) => c,
+            None => Collector {
+                user_id,
+                chat_id,
+                stickers: HashMap::new(),
+            }
+        },
+        Err(e) => {log::error!("Error getting Collector: {}", e); return}
+    };
+    let mut message = String::from("You have: ");
+    for sticker in collector.stickers.keys() {
+        message.push_str(&format!("{} ", sticker));
+    }
+    match send_message(chat_id, &message).await {
+        Ok(_) => (),
+        Err(e) => {log::error!("Error sending message: {}", e); return}
+    };
 }
 
 fn get_id_from_message(message: &serde_json::Value, first_level: &str) -> Option<i64> {
