@@ -119,7 +119,7 @@ pub async fn report_handler(message: &serde_json::Value) {
 
                 match groups.get(group) {
                     Some(v) => {
-                        for i in entities::NON_TEAM_CARDS.0..entities::NON_TEAM_CARDS.1 {
+                        for i in entities::NON_TEAM_CARDS.0..entities::NON_TEAM_CARDS.1 + 1 {
                             match v.get(&i.to_string()) {
                                 Some(n) => match n {
                                     1 => {group_have += 1},
@@ -147,7 +147,7 @@ pub async fn report_handler(message: &serde_json::Value) {
 
                 match groups.get(group) {
                     Some(v) => {
-                        for i in entities::CARDS_PER_TEAM.0..entities::CARDS_PER_TEAM.1 {
+                        for i in entities::CARDS_PER_TEAM.0..entities::CARDS_PER_TEAM.1 + 1 {
                             match v.get(&i.to_string()) {
                                 Some(n) => match n {
                                     1 => {group_have += 1},
