@@ -136,8 +136,8 @@ pub async fn report_handler(message: &serde_json::Value) {
                 have += group_have;
                 repeated += group_repeated;
 
-                let percentage = format!("{:.2}", (group_have as f32 / group_total as f32) * 100.0); 
-                message.push_str(&format!("{}: {}% ({}/{}/{})\n", group, percentage, group_have, group_repeated, group_total));
+                let percentage = format_percentage((group_have as f32 / group_total as f32) * 100.0);
+                message.push_str(&format!("{}: {} ({}/{}/{})\n", group, percentage, group_have, group_repeated, group_total));
             }
 
             for group in entities::TEAMS {
@@ -164,12 +164,12 @@ pub async fn report_handler(message: &serde_json::Value) {
                 have += group_have;
                 repeated += group_repeated;
 
-                let percentage = format!("{:.2}", (group_have as f32 / group_total as f32) * 100.0); 
-                message.push_str(&format!("{}: {}% ({}/{}/{})\n", group, percentage, group_have, group_repeated, group_total));
+                let percentage = format_percentage((group_have as f32 / group_total as f32) * 100.0); 
+                message.push_str(&format!("{}: {} ({}/{}/{})\n", group, percentage, group_have, group_repeated, group_total));
             }
             
-            let percentage = format!("{:.2}", (have as f32 / total as f32) * 100.0); 
-            message.push_str(&format!("\n🏆{}% ({}/{}/{})🏆", percentage, have, repeated, total));
+            let percentage = format_percentage((have as f32 / total as f32) * 100.0); 
+            message.push_str(&format!("\n🏆 {} ({}/{}/{})🏆", percentage, have, repeated, total));
             match send_message(collector.chat_id, &message).await {
                 Ok(_) => (),
                 Err(e) => {log::error!("Error sending message: {}", e); return}
@@ -227,4 +227,13 @@ fn number_to_emoji(n: &u8) -> String {
             _ => "x🔟+"
         }
     )
+}
+
+fn format_percentage(p: f32) -> String {
+    let emoji = match p {
+        p if p == 100.0 => "🟩",
+        p if p > 50.0 => "🟨",
+        _ => "⬜"
+    };
+    return format!("{:.2}%{}", p, emoji);
 }
