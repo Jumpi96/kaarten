@@ -112,61 +112,27 @@ pub async fn report_handler(message: &serde_json::Value) {
             let mut have: u16= 0;
             let mut repeated: u16 = 0;
 
-            for group in entities::SPECIAL_STICKERS {
-                let group_total = u16::from(entities::NON_TEAM_CARDS.1 - entities::NON_TEAM_CARDS.0 + 1);
-                let mut group_have: u16 = 0;
-                let mut group_repeated: u16 = 0;
+            message.push_str(
+                &report_group(
+                    &groups,
+                    entities::SPECIAL_STICKERS,
+                    entities::NON_TEAM_CARDS,
+                    &mut total,
+                    &mut have,
+                    &mut repeated
+                )
+            );
 
-                match groups.get(group) {
-                    Some(v) => {
-                        for i in entities::NON_TEAM_CARDS.0..entities::NON_TEAM_CARDS.1 + 1 {
-                            match v.get(&i.to_string()) {
-                                Some(n) => match n {
-                                    1 => {group_have += 1},
-                                    r => {group_have += 1; group_repeated += u16::from(*r) - 1}
-                                },
-                                None => ()
-                            }
-                        }
-                    },
-                    None => ()
-                }
-
-                total += group_total;
-                have += group_have;
-                repeated += group_repeated;
-
-                let percentage = format_percentage((group_have as f32 / group_total as f32) * 100.0);
-                message.push_str(&format!("{}: {} ({}/{}/{})\n", group, percentage, group_have, group_repeated, group_total));
-            }
-
-            for group in entities::TEAMS {
-                let group_total = u16::from(entities::CARDS_PER_TEAM.1 - entities::CARDS_PER_TEAM.0 + 1);
-                let mut group_have: u16 = 0;
-                let mut group_repeated: u16 = 0;
-
-                match groups.get(group) {
-                    Some(v) => {
-                        for i in entities::CARDS_PER_TEAM.0..entities::CARDS_PER_TEAM.1 + 1 {
-                            match v.get(&i.to_string()) {
-                                Some(n) => match n {
-                                    1 => {group_have += 1},
-                                    r => {group_have += 1; group_repeated += u16::from(*r) - 1}
-                                },
-                                None => ()
-                            }
-                        }
-                    },
-                    None => ()
-                }
-
-                total += group_total;
-                have += group_have;
-                repeated += group_repeated;
-
-                let percentage = format_percentage((group_have as f32 / group_total as f32) * 100.0); 
-                message.push_str(&format!("{}: {} ({}/{}/{})\n", group, percentage, group_have, group_repeated, group_total));
-            }
+            message.push_str(
+                &report_group(
+                    &groups,
+                    entities::SPECIAL_STICKERS,
+                    entities::NON_TEAM_CARDS,
+                    &mut total,
+                    &mut have,
+                    &mut repeated
+                )
+            );
             
             let percentage = format_percentage((have as f32 / total as f32) * 100.0); 
             message.push_str(&format!("\n🏆 {} ({}/{}/{})🏆", percentage, have, repeated, total));
@@ -199,6 +165,39 @@ async fn get_collector_from_message(message: &serde_json::Value) -> Option<Colle
         },
         Err(e) => {log::error!("Error getting Collector: {}", e); None}
     }
+}
+
+fn report_group(stickers: &HashMap<String, HashMap<String, u8>>, groups: &[&str], cards_per_group: (u8, u8),
+        total: &mut u16, have: &mut u16, repeated: &mut u16) -> String {
+    let mut report = String::from("");
+    for group in groups {
+        let group_total = u16::from(cards_per_group.1 - cards_per_group.0 + 1);
+        let mut group_have: u16 = 0;
+        let mut group_repeated: u16 = 0;
+
+        match stickers.get(*group) {
+            Some(v) => {
+                for i in cards_per_group.0..cards_per_group.1 + 1 {
+                    match v.get(&i.to_string()) {
+                        Some(n) => match n {
+                            1 => {group_have += 1},
+                            r => {group_have += 1; group_repeated += u16::from(*r) - 1}
+                        },
+                        None => ()
+                    }
+                }
+            },
+            None => ()
+        }
+
+        *total += group_total;
+        *have += group_have;
+        *repeated += group_repeated;
+
+        let percentage = format_percentage((group_have as f32 / group_total as f32) * 100.0);
+        report.push_str(&format!("{}: {} ({}/{}/{})\n", group, percentage, group_have, group_repeated, group_total));
+    }
+    report
 }
 
 fn get_id_from_message(message: &serde_json::Value, first_level: &str) -> Option<i64> {
