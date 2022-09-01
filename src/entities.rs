@@ -14,7 +14,7 @@ pub const TEAMS: [&str; 32] = [
     "FRA", "AUS", "DEN", "TUN",
     "ESP", "CRC", "GER", "JPN",
     "BEL", "CAN", "MAR", "CRO",
-    "BRA", "SRB", "SUI", "CAM",
+    "BRA", "SRB", "SUI", "CMR",
     "POR", "GHA", "URU", "KOR"
 ];
 pub const CARDS_PER_TEAM: (u8, u8) = (1, 20);
