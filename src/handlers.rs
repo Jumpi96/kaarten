@@ -82,7 +82,7 @@ pub async fn remove_handler(message: &serde_json::Value) {
     }
 }
 
-pub async fn list_handler(message: &serde_json::Value) {
+pub async fn list_handler(message: &serde_json::Value, duplicated: bool) {
     match get_collector_from_message(message).await {
         Some(collector) => {
             let mut message = String::from("🏆 Your WK 2022 stickers ⚽\n");
@@ -90,7 +90,13 @@ pub async fn list_handler(message: &serde_json::Value) {
             for group in groups.keys() {
                 message.push_str(&format!("{} ", group));
                 for sticker in groups.get(group).unwrap() {
-                    message.push_str(&format!("{}{} ", sticker.0, number_to_emoji(sticker.1)))
+                    let mut str_to_push = String::from("");
+                    match duplicated {
+                        true if sticker.1 > &1 => str_to_push = format!("{}{} ", sticker.0, number_to_emoji(&(sticker.1 - 1))),
+                        false => str_to_push = format!("{}{} ", sticker.0, number_to_emoji(sticker.1)),
+                        _ => ()
+                    };
+                    message.push_str(&str_to_push);
                 }
                 message.push_str("\n");
             }
