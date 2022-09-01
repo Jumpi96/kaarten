@@ -132,8 +132,8 @@ pub async fn report_handler(message: &serde_json::Value) {
             message.push_str(
                 &report_group(
                     &groups,
-                    entities::SPECIAL_STICKERS,
-                    entities::NON_TEAM_CARDS,
+                    entities::TEAMS,
+                    entities::CARDS_PER_TEAM,
                     &mut total,
                     &mut have,
                     &mut repeated
