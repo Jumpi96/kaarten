@@ -238,6 +238,8 @@ fn format_percentage(p: f32) -> String {
     let emoji = match p {
         p if p == 100.0 => "🟩",
         p if p > 50.0 => "🟨",
+        p if p > 25.0 => "🟧",
+        p if p > 0.0 => "🟥",
         _ => "⬜"
     };
     return format!("{:.2}%{}", p, emoji);
