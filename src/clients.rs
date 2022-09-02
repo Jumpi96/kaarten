@@ -38,6 +38,10 @@ pub async fn get_collector(user_id: i64, chat_id: i64) -> Result<Option<entities
             Ok(Some(entities::Collector {
                 user_id: user_id,
                 chat_id: chat_id,
+                username: match i.get("Username") {
+                    Some(u) => u.as_s().unwrap_or(&String::from("")).to_string(),
+                    _ => String::from("")
+                },
                 stickers: deserialize_stickers(i.get("Stickers").unwrap())
             }))
         },

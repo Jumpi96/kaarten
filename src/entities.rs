@@ -4,6 +4,7 @@ use std::collections::HashMap;
 pub struct Collector {
     pub user_id: i64,
     pub chat_id: i64,
+    pub username: String,
     pub stickers: HashMap<String, Vec<u64>>
 }
 
@@ -106,6 +107,7 @@ mod tests {
         let c = Collector{
             user_id: 1,
             chat_id: 1,
+            username: String::from("jpl"),
             stickers
         };
         let groups = c.stickers_as_groups();

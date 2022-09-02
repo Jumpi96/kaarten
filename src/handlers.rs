@@ -160,12 +160,17 @@ async fn get_collector_from_message(message: &serde_json::Value) -> Option<Colle
         Some(x) => x,
         _ => {log::error!("Chat ID doesn't exist!"); return None}
     };
+    let username = match get_username_from_message(message) {
+        Some(x) => x,
+        _ => {log::error!("Username doesn't exist!"); ""}
+    };
     match get_collector(user_id, chat_id).await {
         Ok(r) => match r {
             Some(c) => Some(c),
             None => Some(Collector {
                 user_id,
                 chat_id,
+                username: String::from(username),
                 stickers: HashMap::new(),
             })
         },
@@ -213,6 +218,18 @@ fn get_id_from_message(message: &serde_json::Value, first_level: &str) -> Option
     };
     match user_id {
         Some(serde_json::Value::Number(x)) => Some(x.as_i64().unwrap()),
+        _ => None
+    }
+}
+
+
+fn get_username_from_message(message: &serde_json::Value) -> Option<&str> {
+    let username = match message.get("from") {
+        Some(serde_json::Value::Object(x)) => x.get("username"),
+        _ => None
+    };
+    match username {
+        Some(serde_json::Value::String(x)) => Some(x.as_str()),
         _ => None
     }
 }
