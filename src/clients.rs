@@ -58,6 +58,7 @@ pub async fn save_collector(collector: entities::Collector) -> Result<(), Simple
         .table_name(TABLE)
         .item("UserId", AttributeValue::N(collector.user_id.to_string()))
         .item("ChatId", AttributeValue::N(collector.chat_id.to_string()))
+        .item("Username", AttributeValue::S(collector.username))
         .item("Stickers", serialize_stickers(collector.stickers));
 
     match request.send().await {

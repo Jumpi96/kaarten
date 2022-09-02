@@ -112,7 +112,7 @@ pub async fn list_handler(message: &serde_json::Value, duplicated: bool) {
 pub async fn report_handler(message: &serde_json::Value) {
     match get_collector_from_message(message).await {
         Some(collector) => {
-            let mut message = String::from("⚽🏆 Your WK 2022 report 📒⚽\n");
+            let mut message = format!("⚽🏆 Your WK 2022 report 📒⚽\nHi {}!\n\n", collector.username);
             let groups = collector.stickers_as_groups();
             let mut total: u16 = 0;
             let mut have: u16= 0;
