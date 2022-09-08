@@ -9,18 +9,18 @@ pub struct Collector {
 }
 
 pub const TEAMS: &[&str]= &[
-    "QAT", "ECU", "SEN", "NED",
-    "ENG", "IRN", "USA", "WAL",
-    "ARG", "KSA", "MEX", "POL",
-    "FRA", "AUS", "DEN", "TUN",
-    "ESP", "CRC", "GER", "JPN",
-    "BEL", "CAN", "MAR", "CRO",
-    "BRA", "SRB", "SUI", "CMR",
-    "POR", "GHA", "URU", "KOR"
+    "🇶🇦QAT", "🇪🇨ECU", "🇸🇳SEN", "🇳🇱NED",
+    "🏴󠁧󠁢󠁥󠁮󠁧󠁿ENG", "🇮🇷IRN", "🇺🇸USA", "🏴󠁧󠁢󠁷󠁬󠁳󠁿WAL",
+    "🇦🇷ARG", "🇸🇦KSA", "🇲🇽MEX", "🇵🇱POL",
+    "🇫🇷FRA", "🇦🇺AUS", "🇩🇰DEN", "🇹🇳TUN",
+    "🇪🇸ESP", "🇨🇷CRC", "🇩🇪GER", "🇯🇵JPN",
+    "🇧🇪BEL", "🇨🇦CAN", "🇲🇦MAR", "🇭🇷CRO",
+    "🇧🇷BRA", "🇷🇸SRB", "🇨🇭SUI", "🇨🇲CMR",
+    "🇵🇹POR", "🇬🇭GHA", "🇺🇾URU", "🇰🇷KOR"
 ];
 pub const CARDS_PER_TEAM: (u8, u8) = (1, 20);
 
-pub const SPECIAL_STICKERS: &[&str] = &["FWC"];
+pub const SPECIAL_STICKERS: &[&str] = &["🗺️FWC"];
 pub const NON_TEAM_CARDS: (u8, u8) = (0, 29); 
 
 pub fn validate_sticker(s: &str) -> Option<&str> {

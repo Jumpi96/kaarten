@@ -212,7 +212,7 @@ fn report_group(stickers: &HashMap<String, HashMap<String, u8>>, groups: &[&str]
         *repeated += group_repeated;
 
         let percentage = format_percentage((group_have as f32 / group_total as f32) * 100.0);
-        report.push_str(&format!("{}: {} ({}/{}/{})\n", group, percentage, group_have, group_repeated, group_total));
+        report.push_str(&format!("{} {} ({}/{}/{})\n", group, percentage, group_have, group_repeated, group_total));
     }
     report
 }
