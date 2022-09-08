@@ -127,7 +127,7 @@ pub async fn report_handler(message: &serde_json::Value) {
             message.push_str(
                 &report_group(
                     &groups,
-                    entities::SPECIAL_STICKERS,
+                    &entities::SPECIAL_STICKERS,
                     entities::NON_TEAM_CARDS,
                     &mut total,
                     &mut have,
@@ -138,7 +138,7 @@ pub async fn report_handler(message: &serde_json::Value) {
             message.push_str(
                 &report_group(
                     &groups,
-                    entities::TEAMS,
+                    &entities::TEAMS,
                     entities::CARDS_PER_TEAM,
                     &mut total,
                     &mut have,
@@ -184,10 +184,10 @@ async fn get_collector_from_message(message: &serde_json::Value) -> Option<Colle
     }
 }
 
-fn report_group(stickers: &HashMap<String, HashMap<String, u8>>, groups: &[&str], cards_per_group: (u8, u8),
-        total: &mut u16, have: &mut u16, repeated: &mut u16) -> String {
+fn report_group(stickers: &HashMap<String, HashMap<String, u8>>, groups: &phf::Map<&'static str, &'static str>,
+        cards_per_group: (u8, u8), total: &mut u16, have: &mut u16, repeated: &mut u16) -> String {
     let mut report = String::from("");
-    for group in groups {
+    for group in groups.keys() {
         let group_total = u16::from(cards_per_group.1 - cards_per_group.0 + 1);
         let mut group_have: u16 = 0;
         let mut group_repeated: u16 = 0;
@@ -212,7 +212,7 @@ fn report_group(stickers: &HashMap<String, HashMap<String, u8>>, groups: &[&str]
         *repeated += group_repeated;
 
         let percentage = format_percentage((group_have as f32 / group_total as f32) * 100.0);
-        report.push_str(&format!("{} {} ({}/{}/{})\n", group, percentage, group_have, group_repeated, group_total));
+        report.push_str(&format!("{}{} {} ({}/{}/{})\n", groups.get(group).unwrap(), group, percentage, group_have, group_repeated, group_total));
     }
     report
 }
