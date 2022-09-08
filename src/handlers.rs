@@ -88,17 +88,19 @@ pub async fn list_handler(message: &serde_json::Value, duplicated: bool) {
             let mut message = String::from("🏆 Your WK 2022 stickers ⚽\n");
             let groups = collector.stickers_as_groups();
             for group in groups.keys() {
-                message.push_str(&format!("{} ", group));
-                for sticker in groups.get(group).unwrap() {
-                    let mut str_to_push = String::from("");
-                    match duplicated {
-                        true if sticker.1 > &1 => str_to_push = format!("{}{} ", sticker.0, number_to_emoji(&(sticker.1 - 1))),
-                        false => str_to_push = format!("{}{} ", sticker.0, number_to_emoji(sticker.1)),
-                        _ => ()
-                    };
-                    message.push_str(&str_to_push);
+                if groups.get(group).unwrap().keys().len() > 0 {
+                    message.push_str(&format!("{} ", group));
+                    for sticker in groups.get(group).unwrap() {
+                        let mut str_to_push = String::from("");
+                        match duplicated {
+                            true if sticker.1 > &1 => str_to_push = format!("{}{} ", sticker.0, number_to_emoji(&(sticker.1 - 1))),
+                            false => str_to_push = format!("{}{} ", sticker.0, number_to_emoji(sticker.1)),
+                            _ => ()
+                        };
+                        message.push_str(&str_to_push);
+                    }
+                    message.push_str("\n");
                 }
-                message.push_str("\n");
             }
             match send_message(collector.chat_id, &message).await {
                 Ok(_) => (),
