@@ -88,19 +88,23 @@ pub async fn list_handler(message: &serde_json::Value, duplicated: bool) {
             let mut message = String::from("🏆 Your WK 2022 stickers ⚽\n");
             let groups = collector.stickers_as_groups();
             for group in groups.keys() {
-                if groups.get(group).unwrap().keys().len() > 0 {
-                    message.push_str(&format!("{} ", group));
-                    for sticker in groups.get(group).unwrap() {
-                        let mut str_to_push = String::from("");
-                        match duplicated {
-                            true if sticker.1 > &1 => str_to_push = format!("{}{} ", sticker.0, number_to_emoji(&(sticker.1 - 1))),
-                            false => str_to_push = format!("{}{} ", sticker.0, number_to_emoji(sticker.1)),
-                            _ => ()
-                        };
-                        message.push_str(&str_to_push);
-                    }
-                    message.push_str("\n");
+                let mut group_msg = String::from("");
+                let mut group_exists = false;
+                group_msg.push_str(&format!("{} ", group));
+                for sticker in groups.get(group).unwrap() {
+                    let mut str_to_push = String::from("");
+                    match duplicated {
+                        true if sticker.1 > &1 => {
+                            str_to_push = format!("{}{} ", sticker.0, number_to_emoji(&(sticker.1 - 1)));
+                            group_exists = true;
+                        },
+                        false => {str_to_push = format!("{}{} ", sticker.0, number_to_emoji(sticker.1)); group_exists = true;},
+                        _ => ()
+                    };
+                    group_msg.push_str(&str_to_push);
                 }
+                group_msg.push_str("\n");
+                if group_exists {message.push_str(&group_msg)};
             }
             match send_message(collector.chat_id, &message).await {
                 Ok(_) => (),
