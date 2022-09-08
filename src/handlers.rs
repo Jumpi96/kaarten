@@ -11,7 +11,7 @@ pub async fn add_handler(message: &serde_json::Value) {
             let mut count_new = 0;
             let mut count_dup = 0;
             for s in stickers {
-                match validate_sticker(s) {
+                match validate_sticker(s.to_uppercase().as_str()) {
                     Some(sticker) => {
                         let time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
                         let time_vec: Vec<u64> = vec![time.as_secs()];
@@ -46,7 +46,7 @@ pub async fn remove_handler(message: &serde_json::Value) {
             let stickers: Vec<&str> = message.get("text").unwrap().as_str().unwrap().split(' ').collect();
             let mut count = 0;
             for s in stickers {
-                match validate_sticker(s) {
+                match validate_sticker(s.to_uppercase().as_str()) {
                     Some(sticker) => {
                         match collector.stickers.get(sticker) {
                             Some(v) => {
