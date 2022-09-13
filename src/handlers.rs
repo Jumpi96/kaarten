@@ -9,14 +9,15 @@ pub async fn add_handler(message: &serde_json::Value) {
         Some(mut collector) => {
             let stickers: Vec<&str> = message.get("text").unwrap().as_str().unwrap().split(' ').collect();
             let mut count_new = 0;
-            let mut count_dup: Vec<String> = vec![];
+            let mut duplicates: Vec<String> = vec![];
             for s in stickers {
-                match validate_sticker(s.to_uppercase().as_str()) {
+                let upper_s = s.to_uppercase();
+                match validate_sticker(upper_s.as_str()) {
                     Some(sticker) => {
                         let time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
                         let time_vec: Vec<u64> = vec![time.as_secs()];
                         let s_vec = match collector.stickers.get(sticker) {
-                            Some(v) => {count_dup.push(String::from(sticker)); [v.as_slice(), time_vec.as_slice()].concat()},
+                            Some(v) => {duplicates.push(String::from(sticker)); [v.as_slice(), time_vec.as_slice()].concat()},
                             None => {count_new += 1; time_vec}
                         };
                         collector.stickers.insert(String::from(sticker), s_vec);
@@ -26,7 +27,13 @@ pub async fn add_handler(message: &serde_json::Value) {
                 }
             }
             let chat_id = collector.chat_id;
-            let message = &format!("🏆✍️ Great! {} new stickers and {} duplicated ones.", count_new, count_dup.len());
+            let count_dup = duplicates.len();
+            let mut dup_message = String::new();
+            for dup in duplicates {
+                dup_message.push_str(&format!("{} ", dup));
+            }
+            dup_message.pop();
+            let message = &format!("🏆✍️ Great! {} new stickers and {} duplicated ones ({}).", count_new, count_dup, dup_message);
             match save_collector(collector).await {
                 Ok(()) => match send_message(chat_id, message).await {
                     Ok(_) => (),
