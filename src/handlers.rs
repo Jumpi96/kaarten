@@ -26,7 +26,7 @@ pub async fn add_handler(message: &serde_json::Value) {
                 }
             }
             let chat_id = collector.chat_id;
-            let message = &format!("🏆✍️ Great! {} new stickers and {} duplicated ones ({:?}).", count_new, count_dup.len(), count_dup);
+            let message = &format!("🏆✍️ Great! {} new stickers and {} duplicated ones.", count_new, count_dup.len());
             match save_collector(collector).await {
                 Ok(()) => match send_message(chat_id, message).await {
                     Ok(_) => (),
