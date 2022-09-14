@@ -122,6 +122,45 @@ pub async fn list_handler(message: &serde_json::Value, duplicated: bool) {
     }
 }
 
+pub async fn ls_handler(message: &serde_json::Value, duplicated: bool) {
+    match get_collector_from_message(message).await {
+        Some(collector) => {
+            let mut message = String::new();
+            if duplicated {
+                for sticker in collector.stickers.keys() {
+                    let n_sticker = collector.stickers.get(sticker).unwrap().len();
+                    for _ in 1..n_sticker {
+                        message.push_str(&format!("{},", sticker));
+                    }
+                }
+            } else {
+                let definitions = vec![(entities::NON_TEAM_CARDS, &entities::SPECIAL_STICKERS), (entities::CARDS_PER_TEAM, &entities::TEAMS)];
+                for definition in definitions {
+                    for n in definition.0.0..definition.0.1+1 {
+                        for group in definition.1.keys() {
+                            let sticker = format!("{}{}", group, n);
+                            if !collector.stickers.contains_key(&sticker) {
+                                if sticker == "FWC00" {
+                                    message.push_str("00");
+                                } else {
+                                    message.push_str(&format!("{},", sticker));
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+            message.pop();
+            match send_message(collector.chat_id, &message).await {
+                Ok(_) => (),
+                Err(e) => {log::error!("Error sending message: {}", e); return}
+            };
+        },
+        None => ()
+    }
+}
+
 pub async fn report_handler(message: &serde_json::Value) {
     match get_collector_from_message(message).await {
         Some(collector) => {
