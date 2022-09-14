@@ -136,8 +136,8 @@ pub async fn ls_handler(message: &serde_json::Value, duplicated: bool) {
             } else {
                 let definitions = vec![(entities::NON_TEAM_CARDS, &entities::SPECIAL_STICKERS), (entities::CARDS_PER_TEAM, &entities::TEAMS)];
                 for definition in definitions {
-                    for n in definition.0.0..definition.0.1+1 {
-                        for group in definition.1.keys() {
+                    for group in definition.1.keys() {
+                        for n in definition.0.0..definition.0.1+1 {
                             let sticker = format!("{}{}", group, n);
                             if !collector.stickers.contains_key(&sticker) {
                                 if sticker == "FWC00" {
