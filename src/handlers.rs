@@ -140,7 +140,7 @@ pub async fn ls_handler(message: &serde_json::Value, duplicated: bool) {
                         for n in definition.0.0..definition.0.1+1 {
                             let sticker = format!("{}{}", group, n);
                             if !collector.stickers.contains_key(&sticker) {
-                                if sticker == "FWC00" {
+                                if sticker == "FWC0" {
                                     message.push_str("00");
                                 } else {
                                     message.push_str(&format!("{},", sticker));
