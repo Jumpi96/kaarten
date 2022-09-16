@@ -141,7 +141,7 @@ pub async fn ls_handler(message: &serde_json::Value, duplicated: bool) {
                             let sticker = format!("{}{}", group, n);
                             if !collector.stickers.contains_key(&sticker) {
                                 if sticker == "FWC0" {
-                                    message.push_str("00");
+                                    message.push_str("00,");
                                 } else {
                                     message.push_str(&format!("{},", sticker));
                                 }
